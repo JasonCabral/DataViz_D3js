@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.2.0.min.js"></script>
+</head>
+<style type="text/css">
+  #chartContainer {
+    margin: auto;
+    width: 80vw;
+    height: 65vh;
+    padding: 10px;
+  }
+
+  .button {
+    margin: 0px 2px 0px 2px;
+    height: 30px;
+    position: relative;
+    width: 50px;
+    vertical-align: text-top;
+  }
+
+  #btext{
+    height: 30px;
+    position: relative;
+    width: 50px;
+    padding: 10px;
+  }
+
+  #Legend {
+    position: relative;
+    left: 19vw;   
+  }
+
+  h1 {
+    font-size: 30px;
+    font-family: Helvetica;
+  }
+
+  #transition_click {
+    margin: auto;
+    width: auto;
+    height: auto;
+    padding: 10px;
+  }
+
+  #end_link {
+    padding: 10px;
+  }
+
+  #revenue_tick {
+    text-anchor: end;
+    font-family: sans-serif;
+    font-size: 10px;
+    position: absolute;
+    bottom: 30vh;
+  }
+
+  label {
+    height: 30px;
+    position: relative;
+    left: 19vw;
+    width: 50px;
+    padding: 10px;
+    top: 2vh;
+  }
+
+  #init_legend {
+    position: relative;
+    left: 19vw;
+  }
+
+
+</style>
+
+<h1>
+  Is the TSA really to blame for delays in air travel?
+</h1>
+<p>
+In May 2016, the Transportation Security Administration (TSA) came under intense scrutiny following reports of massive delays in airports throughout the United States. This has manifested in <a href="http://www.columbiamissourian.com/opinion/editorial-shameful-practices-of-the-tsa-must-be-addressed/article_f70ef848-1dd6-11e6-b66c-3b2e82d20725.html" target="_blank">scathing editorials</a>, a <a href="https://twitter.com/hashtag/ihatethewait" target="_blank">trending hashtag</a>, a <a href="http://www.nytimes.com/2016/05/13/us/politics/congresss-list-of-gripes-with-tsa-is-long-like-an-airport-security-line.html" target="_blank">congressional hearing</a>, and ultimately the <a href="http://www.cnn.com/2016/05/23/politics/kelly-hoggan-tsa-resigns/" target="_blank">ousting of the TSA's Head of Security</a> amid allegations of misconduct. Given the current negative attitudes toward the TSA, it would be easy to assume that long wait lines for security or bag checks would be the major source of delays in air travel, but is this really the case?
+</p>
+<p2>
+</p2>
+<label>
+</label>
+<div id="option">
+    <input name="updateButton" 
+           type="button"
+           id="transition_click" 
+           value="Click Here To Find Out!" 
+           onclick="updateData()" />
+</div>
+<body id="chartContainer">
+  <script type="text/javascript">
+    
+    var svg_init = dimple.newSvg("#chartContainer", height = '100%', width = '100%')
+    d3.csv("2015_airline_delays_gathered2.csv", function (error, data) {
+      
+      data = dimple.filterData(data, 'Delay', 'Security Delay')
+
+      var myChart = new dimple.chart(svg_init, data);
+      myChart.setMargins("-75%", "4%", "7%", "10%")
+      var x = myChart.addMeasureAxis("x", 'Total Delay per 1000 Flights');
+      x.tickFormat = ',.1f';
+
+      var y = myChart.addCategoryAxis("y", "Airline");
+
+      var firstSeries = myChart.addSeries("Delay", dimple.plot.bar, [x, y]);
+      var myLegend = myChart.addLegend("-130px", "60px", "60px", "60px", "left", firstSeries);
+
+      myChart.draw();
+
+      // Responsive To Window Resizing and Matching Color to Final Chart
+      window.onresize = function () {
+        myChart.draw(0, true);
+        d3.selectAll('rect')
+        .attr('style', 'fill: rgb(179, 222, 105); stroke: rgb(149, 185, 87);')
+        .attr('fill', "#B3DE69")
+        .attr('stroke', "#95b957") 
+        d3.selectAll('.dimple-legend.dimple-security-delay')
+          .attr("transform", "translate(-45,-20)") 
+      };
+      
+      x.titleShape.text("Total Delay per 1000 Flights (minutes)")
+      
+      d3.select('svg').attr('id', 'init')
+      
+      d3.selectAll('rect')
+        .attr('style', 'fill: rgb(179, 222, 105); stroke: rgb(149, 185, 87);')
+        .attr('fill', "#B3DE69")
+        .attr('stroke', "#95b957") 
+    
+    d3.selectAll('.dimple-legend.dimple-security-delay').attr('id', 'init_legend')
+      .attr("transform", "translate(-45,-20)")      
+    });
+
+
+  // Present Final Visualization and Text After User Interation
+  function updateData() {
+
+    d3.select('#option').remove()
+
+    d3.select('#init').remove()
+    
+    d3.select("p").html("")
+    d3.select("p")
+      .append("s1")
+      .html("According to data provided by the Bureau of Transportation Statistics, Security Delays accounted for approximately \
+        0.35% of total delay time in 2015. While data for May 2016 was not yet available at the time of coding, this trend \
+        continued through April of 2016. In fact, despite ")
+      
+    d3.select("p")
+      .append("a")
+      .attr("href", "http://www.usatoday.com/story/opinion/2016/05/26/tsa-airlines-for-america-editorials-debates/85001610/")
+      .attr("target", "_blank")
+      .html("claims from representatives of the airline industry")
+
+    d3.select("p")
+      .append("s2")
+      .html(", airlines and airports were much more likely in 2015 to be the cause of delayed air travel than either TSA screening or extreme weather events.")
+
+    d3.select("p2").html("One would also expect that airlines with higher revenue (higher fares and baggage fees) would provide \
+      better service and be less prone to delay, but in 2015, this was simply not the case. \
+      Lower revenue airlines such as Alaska Airlines, Virgin America and SkyWest Airlines were among the top five performers \
+      with regard to Carrier Delays, while United Air Lines (the second biggest airline by 2015 revenue) was the worst performer\
+       in this category.<br>")
+
+    d3.select('label')
+      .append('input')
+      .attr('type', 'checkbox')
+    
+    d3.select('label')
+      .append('tspan')
+      .text('Sort by 2015 Revenue')
+    
+
+    var svg = dimple.newSvg("#chartContainer", height = '100%', width = '100%')
+    d3.csv("2015_airline_delays_gathered2.csv", function (error, data) {
+      
+      var myChart = new dimple.chart(svg, data);
+      myChart.setMargins("-75%", "4%", "7%", "10%")
+      
+      var x = myChart.addMeasureAxis("x", 'Total Delay per 1000 Flights');
+      x.tickFormat = ',.1f';
+
+      var y = myChart.addCategoryAxis("y", "Airline");
+
+      var firstSeries = myChart.addSeries("Delay", dimple.plot.bar, [x, y]);
+      var myLegend = myChart.addLegend("-17%", "10%", "10%", "10%", "left", firstSeries);
+
+      // Sort by 2015 Airline Revenue
+      d3.select("input").on("change", change);
+
+      function change() {
+        y._orderRules = []
+        var opt = this.checked ? "revenue" : "Delay";
+        y.addOrderRule(opt);
+        myChart.draw(800);
+        fix_labels2();
+      }
+
+      // Add Buttons For Filtering by Month
+      d3.select("body")
+        .append('btext')
+        .attr("id", "btext")
+        .html("Select to filter by Month:")
+
+      var buttonNames = ["All", "All", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+      
+      d3.select("body")
+        .selectAll("input")
+        .data(buttonNames)
+        .enter()
+        .append("input")
+        .attr("type","button")
+        .attr("class","button")
+        .attr("value", function (d){return d;} )
+        .attr("id", function (d){return d;})
+
+      d3.select("body")
+        .append("bot_text")
+      
+      d3.select("bot_text")
+        .append("t1")
+        .html("<br><br>Guide:<br>")
+      
+      d3.select("bot_text")
+        .append("t2")
+        .html("<b>National Aviation System (NAS) Delay: <b>")
+
+      d3.select("bot_text")
+        .append("t3")
+        .html("Delays that refer to a broad set of conditions, such as non-extreme weather conditions, airport operations, heavy traffic volume, and air traffic control.<br>")
+
+      d3.select("bot_text")
+        .append("t4")
+        .html("<b>Carrier Delay: <b>")
+
+      d3.select("bot_text")
+        .append("t5")
+        .html("Delays due to circumstances within the airline's control (e.g. maintenance or crew problems, aircraft cleaning, baggage loading, fueling, etc.)<br>")
+
+      d3.select("bot_text")
+        .append("t6")
+        .html("<b>Weather Delay: <b>")
+
+      d3.select("bot_text")
+        .append("t7")
+        .html("Significant meteorological conditions (actual or forecasted) that, in the judgment of the carrier, delays the operation of a flight (e.g. tornado, blizzard or hurricane).<br>")
+
+      d3.select("bot_text")
+        .append("t8")
+        .html("<b>Security Delay: <b>")
+
+      d3.select("bot_text")
+        .append("t9")
+        .html("Delays caused by evacuation of a terminal or concourse, re-boarding of aircraft because of security breach, inoperative screening equipment and/or long lines in excess of 29 minutes at screening areas.")
+
+      d3.select("body")
+        .append("bot_source")
+      
+      d3.select("bot_source")
+        .append("s_title")  
+        .html("<br><br>Source: Bureau of Transportation Statistics<br>")
+
+      d3.select("bot_source")
+        .append("a")
+        .attr("id", "end_link")
+        .attr("href", "http://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp?pn=1")
+        .attr("target", "_blank")
+        .html("Data")
+
+      d3.select("bot_source")
+        .append("a")
+        .attr("id", "end_link")
+        .attr("href", "http://www.rita.dot.gov/bts/help/aviation/html/understanding.html")
+        .attr("target", "_blank")
+        .html("Explanation")      
+
+      myChart.draw(800);
+
+      
+      
+      window.onresize = function () {
+        myChart.draw(0, true);
+        fix_labels2();
+      };
+
+      // Encode Y Ticks with Revenue Information
+      var revenueArray = {};
+      revenueArray["Alaska Airlines Inc."] = "$3.95M";
+      revenueArray["American Airlines Inc."] = "$24.02M";
+      revenueArray["Delta Air Lines Inc."] = "$28.22M";
+      revenueArray["Envoy Air"] = "$0.66M";
+      revenueArray["ExpressJet Airlines Inc."] = "$0.98M";
+      revenueArray["Frontier Airlines Inc."] = "$1.19M";
+      revenueArray["Hawaiian Airlines Inc."] = "$2.01M";
+      revenueArray["JetBlue Airways"] = "$5.89M";
+      revenueArray["SkyWest Airlines Inc."] = "$1.88M";
+      revenueArray["Southwest Airlines Co."] = "$18.30M";
+      revenueArray["Spirit Air Lines"] = "$1.27M";
+      revenueArray["United Air Lines Inc."] = "$26.16M";
+      revenueArray["US Airways Inc."] = "$5.01M";
+      revenueArray["Virgin America"] = "$1.34M";
+
+      d3.select('g.dimple-axis.dimple-axis-y')
+        .data(data)
+        .selectAll('g.tick')
+        .select('text')
+        .attr("transform", "translate(0,-6)")
+        
+      d3.select('g.dimple-axis.dimple-axis-y')
+        .data(data)
+        .selectAll('g.tick')      
+        .append('text')
+        .text(function (d) {return revenueArray[d]})
+        .attr('id', 'revenue_tick')
+        .attr("transform", "translate(-30,-30)")
+
+
+      // Ensure Axis and Tick Label Integrity After Redraw
+      function fix_labels() {
+
+        d3.selectAll('#revenue_tick')
+          .attr("transform", "translate(-10,-9)")
+
+        x.titleShape.text("Total Delay per 1000 Flights (minutes)")
+        y.titleShape.text("Airline (2015 Revenue)")
+      }
+
+      function fix_labels2() {
+
+        d3.selectAll('#revenue_tick')
+          .attr("transform", "translate(-1,9)")
+
+        x.titleShape.text("Total Delay per 1000 Flights (minutes)")
+        y.titleShape.text("Airline (2015 Revenue)")
+      }      
+
+    // Interactive Legend
+    myChart.legends = [];
+
+    svg.selectAll("title_text")
+      .data(["Click legend to","show/hide delay types:"])
+      .enter()
+      .append("text")
+        .attr("x", function(){
+          var leg_x = d3.select('.dimple-legend').select('.dimple-legend-text').attr('x');
+          return (leg_x - 22);
+        })
+        .attr("y", function (d, i) { 
+          var leg_y = d3.select('.dimple-legend').select('.dimple-legend-text').attr('y');
+          return (leg_y - 30) + i * 14;
+        })
+        .style("font-family", "sans-serif")
+        .style("font-size", "10px")
+        .style("color", "Black")
+        .attr("id", "Legend")
+        .text(function (d) { return d; });
+
+    d3.selectAll('.dimple-legend')
+      .attr('id', 'Legend');
+
+    // Get a unique list of Owner values to use when filtering
+    var filterValues = dimple.getUniqueValues(data, "Delay");
+    
+    // Get all the rectangles from our now orphaned legend
+    myLegend.shapes.selectAll("rect")
+      // Add a click event to each rectangle
+      .on("click", function (e) {
+        // This indicates whether the item is already visible or not
+        var hide = false;
+        var newFilters = [];
+        // If the filters contain the clicked shape hide it
+        filterValues.forEach(function (f) {
+          if (f === e.aggField.slice(-1)[0]) {
+            hide = true;
+          } else {
+            newFilters.push(f);
+          }
+        });
+        // Hide the shape or show it
+        if (hide) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          newFilters.push(e.aggField.slice(-1)[0]);
+          d3.select(this).style("opacity", 0.8);
+        }
+        // Update the filters
+        filterValues = newFilters;
+        
+        // Filter the data
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+
+        myChart.draw(800);
+        fix_labels2();
+
+      });
+
+      // To Change Month Value, get its location
+      var monthValue = document.getElementById('month');
+
+      // Initialize Month Filters
+      monthFilters = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+      var monthData = dimple.filterData(data, 'month', monthFilters);
+
+      function minusMon(array, mon) {
+        i = array.indexOf(mon);
+        array.splice(i, 1);
+        return array;
+      }
+
+      // Add eventhandlers for buttons here
+      d3.select("#All").on("click", function() {
+
+        var i, s, allArray = ['#Jan','#Feb','#Mar','#Apr',"#May", "#Jun", "#Jul", "#Aug", "#Sept", "#Oct", "#Nov", "#Dec"], len = allArray.length;
+        for (i=0; i<len; ++i) {
+          if (i in allArray) {  
+            s = allArray[i];
+            d3.select(s).style("opacity", 1);
+          }  
+        }
+
+        monthFilters = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      
+
+      d3.select("#Jan").on("click", function() {
+
+        if (monthFilters.indexOf('1') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '1');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('1');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Feb").on("click", function() {
+
+        if (monthFilters.indexOf('2') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '2');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('2');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Mar").on("click", function() {
+
+        if (monthFilters.indexOf('3') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '3');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('3');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Apr").on("click", function() {
+
+        if (monthFilters.indexOf('4') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '4');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('4');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#May").on("click", function() {
+
+        if (monthFilters.indexOf('5') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '5');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('5');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Jun").on("click", function() {
+
+        if (monthFilters.indexOf('6') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '6');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('6');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Jul").on("click", function() {
+
+        if (monthFilters.indexOf('7') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '7');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('7');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Aug").on("click", function() {
+
+        if (monthFilters.indexOf('8') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '8');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('8');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Sept").on("click", function() {
+
+        if (monthFilters.indexOf('9') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '9');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('9');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Oct").on("click", function() {
+
+        if (monthFilters.indexOf('10') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '10');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('10');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Nov").on("click", function() {
+
+        if (monthFilters.indexOf('11') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '11');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('11');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+      d3.select("#Dec").on("click", function() {
+
+        if (monthFilters.indexOf('12') >= 0) {
+          hide2 = true;
+            minusMon(monthFilters, '12');
+        } else {
+          hide2 = false;
+          monthFilters.unshift('12');
+        }
+
+        if (hide2) {
+          d3.select(this).style("opacity", 0.2);
+        } else {
+          d3.select(this).style("opacity", 1);
+        }
+        
+        var monthData = dimple.filterData(data, 'month', monthFilters);
+        myChart.data = dimple.filterData(monthData, "Delay", filterValues);
+        myChart.draw(700);
+        fix_labels2();
+      });
+
+      fix_labels(); 
+    }); 
+  }      
+
+  </script>
+</body>
+
+</html>
+
