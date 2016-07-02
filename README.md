@@ -1,3 +1,6 @@
+﻿# Visualization
+http://bl.ocks.org/JasonCabral/raw/c02ad73a33ad1114c3bcdead1ce640fe/
+
 # Summary
 In May 2016, there seemed to be a universally accepted notion that the TSA was responsible for many delays in air travel, but the data tells a different story. In fact, airports and airlines are drastically more likely to be the cause of delays, which is shown by the visualization. Contrary to reason, an airline’s revenue has very little to do with it’s ability to limit delays, so check the data before assuming that your costlier ticket will result in a higher likelihood for an on-time flight.
 
